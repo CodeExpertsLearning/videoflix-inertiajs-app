@@ -13,3 +13,14 @@ Route::get('dashboard', function () {
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
+
+
+
+Route::prefix('media')
+    ->name('media.')
+    ->middleware('auth')
+    ->group(function() {
+        Route::resource('contents', \App\Http\Controllers\Media\ContentController::class);
+    });
+
+
