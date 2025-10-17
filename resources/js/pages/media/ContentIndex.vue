@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ContentController from '@/actions/App/Http/Controllers/Media/ContentController';
+import TextLink from '@/components/TextLink.vue';
 import {
     Table,
     TableBody,
@@ -11,11 +12,20 @@ import {
 import Pagination from '@/components/videoflix/Pagination.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, useForm } from '@inertiajs/vue3';
+import { Pencil, Trash } from 'lucide-vue-next';
 
 const props = defineProps({
     contents: Object,
 });
+
+const form = useForm({});
+
+const removeContent = (content) => {
+    if (!confirm('Deseja mesmo remover este conteúdo?')) return;
+
+    form.delete(ContentController.destroy(content));
+};
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -35,7 +45,7 @@ console.log(props.contents);
                     <TableHead class="w-[100px]"> # </TableHead>
                     <TableHead>Conteúdo</TableHead>
                     <TableHead>Criado em</TableHead>
-                    <TableHead class="text-right"> Ações </TableHead>
+                    <TableHead> Ações </TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -45,7 +55,22 @@ console.log(props.contents);
                     </TableCell>
                     <TableCell>{{ content.title }}</TableCell>
                     <TableCell>{{ content.created_at }}</TableCell>
-                    <TableCell class="text-right"> </TableCell>
+                    <TableCell class="flex gap-x-2">
+                        <TextLink
+                            :href="
+                                ContentController.edit({ content: content.id })
+                            "
+                            class="rounded border border-blue-900 bg-blue-700 px-4 py-2 font-bold text-white no-underline transition duration-300 ease-in-out hover:bg-blue-900"
+                        >
+                            <Pencil />
+                        </TextLink>
+                        <TextLink
+                            @click.prevent="removeContent(content.id)"
+                            class="rounded border border-red-900 bg-red-700 px-4 py-2 font-bold text-white no-underline transition duration-300 ease-in-out hover:bg-red-900"
+                        >
+                            <Trash />
+                        </TextLink>
+                    </TableCell>
                 </TableRow>
             </TableBody>
         </Table>
