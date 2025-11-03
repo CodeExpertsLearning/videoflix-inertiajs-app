@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Media;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\VideoEncodingJob;
+use App\Jobs\VideoThumbGenerateJob;
 use App\Models\Content;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -68,6 +69,7 @@ class VideosController extends Controller
                 'video' => $save->getFile()->storeAs('', str()->uuid(), 'videos')
             ]);
 
+            dispatch(new VideoThumbGenerateJob($video));
             dispatch(new VideoEncodingJob($video));
         }
 

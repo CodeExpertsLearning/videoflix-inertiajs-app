@@ -2,6 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Events\VideoFlix\EncodeVideoFinished;
+use App\Events\VideoFlix\EncodeVideoProgress;
+use App\Events\VideoFlix\EncodeVideoStarted;
 use App\Models\Video;
 use FFMpeg\Format\Video\X264;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -26,7 +29,7 @@ class VideoEncodingJob implements ShouldQueue
      */
     public function handle(): void
     {
-        //Dispararia um evento de inicializacao do encoding
+        event(new EncodeVideoStarted($this->video->id));
 
         $videoNewName = str_replace(strrchr($this->video->video, '.'), '', $this->video->video) . '.m3u8';
 
@@ -42,7 +45,7 @@ class VideoEncodingJob implements ShouldQueue
             ->addFormat($mid)
             ->addFormat($high)
             ->onProgress(function($progress){
-                //Dispararia um evento via broadcast com as infos do progresso
+                event(new EncodeVideoProgress($this->video->id, $progress));
             })
             ->toDisk('videos_encoded')
             ->save($this->video->code . '/' . $videoNewName);
@@ -54,6 +57,6 @@ class VideoEncodingJob implements ShouldQueue
             'is_processed' => true
         ]);
 
-        //Dispararia um evento de finalizacao do encoding
+        event(new EncodeVideoFinished($this->video->id));
     }
 }

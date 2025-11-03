@@ -7,28 +7,42 @@ import VideoItem from '@/components/videoflix/VideoItem.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, usePage } from '@inertiajs/vue3';
+import { useEchoPublic } from '@laravel/echo-vue';
 import { createUpload } from '@mux/upchunk';
 import axios from 'axios';
 import { ref } from 'vue';
 
+useEchoPublic('videos', '.App\\Events\\VideoFlix\\EncodeVideoStarted', (e) => {
+    const video = findVideoByID(e.videoId);
+    if (!video) return;
+
+    video.encoding = true;
+});
+
+useEchoPublic('videos', '.App\\Events\\VideoFlix\\EncodeVideoProgress', (e) => {
+    const video = findVideoByID(e.videoId);
+    if (!video) return;
+
+    video.encodingProgress = e.progress;
+});
+
+useEchoPublic('videos', '.App\\Events\\VideoFlix\\EncodeVideoFinished', (e) => {
+    const video = findVideoByID(e.videoId);
+    if (!video) return;
+
+    video.encoding = false;
+});
+
+useEchoPublic('videos', '.App\\Events\\VideoFlix\\VideoThumbGenerated', (e) => {
+    const video = findVideoByID(e.videoId);
+    if (!video) return;
+
+    video.thumb = e.thumb;
+});
+
 const props = defineProps({
     content: Object,
 });
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '',
-    },
-    {
-        title: 'Conteúdos',
-        href: '',
-    },
-    {
-        title: 'Criar Conteúdo',
-        href: '',
-    },
-];
 
 const isDragged = ref(false);
 
@@ -51,6 +65,9 @@ const mainHandleVideos = (videos) => {
                     name: res.data.name,
                     uploading: true,
                     uploadProgress: 0,
+                    encoding: false,
+                    encodingProgress: 0,
+                    thumb: null,
                     file: chunckUpload(video, {
                         video: res.data.id,
                         content: props.content.id,
@@ -106,6 +123,21 @@ const cancelUpload = (videoId) => {
         },
     );
 };
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Dashboard',
+        href: '',
+    },
+    {
+        title: 'Conteúdos',
+        href: '',
+    },
+    {
+        title: 'Criar Conteúdo',
+        href: '',
+    },
+];
 </script>
 
 <template>

@@ -38,25 +38,33 @@ const updateVideo = () => {
             <div class="w-full max-w-[350px] space-y-3">
                 <div class="h-[180px] w-full">
                     <img
+                        v-if="!video.thumb"
                         src="https://placeholdit.com/320x180/dddddd/999999"
+                        class="h-[180px] w-full rounded bg-white p-1 shadow"
+                    />
+                    <img
+                        v-if="video.thumb"
+                        :src="`/storage/${video.thumb}`"
                         class="h-[180px] w-full rounded bg-white p-1 shadow"
                     />
                 </div>
 
                 <!-- Encoding Status -->
-                <!-- <div class="space-y-1">
-                                <div
-                                    class="h-3 overflow-hidden rounded bg-gray-100 shadow-inner"
-                                >
-                                    <div
-                                        class="h-full bg-green-500"
-                                        style="width: 65%"
-                                    ></div>
-                                </div>
-                                <div class="text-sm font-bold text-white">
-                                    Convertendo vídeo
-                                </div>
-                            </div> -->
+                <div class="space-y-1" v-if="video.encoding">
+                    <div
+                        class="h-3 overflow-hidden rounded bg-gray-100 shadow-inner"
+                    >
+                        <div
+                            class="h-full bg-green-500"
+                            :style="{
+                                width: `${video.encodingProgress}%`,
+                            }"
+                        ></div>
+                    </div>
+                    <div class="text-sm font-bold text-white">
+                        Convertendo vídeo
+                    </div>
+                </div>
                 <!-- Encoding Status -->
 
                 <!-- Uploading Status -->
@@ -130,8 +138,6 @@ const updateVideo = () => {
                         type="text"
                         class="mt-1 block w-full p-2 text-white"
                         v-model="form.description"
-                        required
-                        autofocus
                         autocomplete=""
                     />
 
