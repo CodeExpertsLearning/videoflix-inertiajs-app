@@ -1,20 +1,26 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('home');
 
-Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
 
 
+
+Route::get('dashboard', [\App\Http\Controllers\MyContentsController::class, 'index'])
+        ->middleware(['auth', 'verified'])
+        ->name('my.contents');
+
+Route::get('watch/{content:slug}', [\App\Http\Controllers\MyContentsController::class, 'watch'])
+    ->middleware('auth')
+    ->name('watch.video');
 
 Route::prefix('media')
     ->name('media.')
@@ -49,3 +55,18 @@ Route::prefix('media')
     });
 
 
+
+Route::get('resources/{code}/{video}', function($code, $video) {
+    $video = $code . '/' . $video;
+
+    return Storage::disk('videos_encoded')
+            ->response(
+                $video,
+                null,
+                [
+                    'Content-Type' => 'application/x-mpegURL',
+                    'isHls' => true
+                ]
+            );
+
+})->name('stream_player');

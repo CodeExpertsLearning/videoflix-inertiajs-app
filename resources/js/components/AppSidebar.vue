@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { index } from '@/actions/App/Http/Controllers/Media/ContentController';
+import MyContentsController from '@/actions/App/Http/Controllers/MyContentsController';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -12,7 +13,6 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
 import { LayoutGrid, Play } from 'lucide-vue-next';
@@ -21,7 +21,7 @@ import AppLogo from './AppLogo.vue';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: dashboard(),
+        href: MyContentsController.index(),
         icon: LayoutGrid,
     },
     {
@@ -51,7 +51,7 @@ const footerNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link :href="dashboard()">
+                        <Link :href="MyContentsController.index()">
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>

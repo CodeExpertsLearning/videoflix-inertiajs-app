@@ -1,14 +1,17 @@
 <script setup lang="ts">
+import MyContentsController from '@/actions/App/Http/Controllers/MyContentsController';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
-import PlaceholderPattern from '../components/PlaceholderPattern.vue';
+import { Head, Link } from '@inertiajs/vue3';
+
+defineProps({
+    contents: Array,
+});
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: dashboard().url,
+        href: MyContentsController.index(),
     },
 ];
 </script>
@@ -17,30 +20,53 @@ const breadcrumbs: BreadcrumbItem[] = [
     <Head title="Dashboard" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div
-            class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
-        >
-            <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-                >
-                    <PlaceholderPattern />
-                </div>
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-                >
-                    <PlaceholderPattern />
-                </div>
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-                >
-                    <PlaceholderPattern />
-                </div>
-            </div>
-            <div
-                class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border"
+        <div class="flex w-full items-center justify-between px-5 py-2">
+            <h2
+                class="w-full border-b border-gray-600 pb-2 text-2xl font-bold text-white capitalize"
             >
-                <PlaceholderPattern />
+                Conteúdos
+            </h2>
+        </div>
+
+        <div class="grid w-full grid-cols-4 gap-x-4 gap-y-5 p-5">
+            <div
+                v-for="content of contents"
+                :key="content.id"
+                class="group relative w-[320px] shadow shadow-white"
+            >
+                <Link
+                    :href="
+                        MyContentsController.watch({ content: content.slug })
+                            .url
+                    "
+                >
+                    <img
+                        v-if="content.cover"
+                        :src="`/storage/${content.cover}`"
+                        alt="`Capa Conteúdo: ${content.title}`"
+                    />
+                    <img
+                        v-if="!content.cover"
+                        src="https://placeholdit.com/320x220?text=Sem+Foto"
+                        alt="`Capa Conteúdo: ${content.title}`"
+                    />
+
+                    <div
+                        class="absolute top-0 bottom-0 hidden h-full w-full bg-black/60 p-1 group-hover:block"
+                    >
+                        <h2
+                            class="mb-4 block text-xl font-bold text-white capitalize"
+                        >
+                            {{ content.title }}
+                        </h2>
+                        <p class="text-white">
+                            {{ content.description }}
+                        </p>
+                        <strong class="mt-4 block text-xl font-bold"
+                            >ASSISTIR...</strong
+                        >
+                    </div>
+                </Link>
             </div>
         </div>
     </AppLayout>
